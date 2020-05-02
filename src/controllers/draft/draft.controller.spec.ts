@@ -6,9 +6,6 @@ import { DraftService } from '../../services/draft/draft.service';
 import { PlayerService } from '../../services/player/player.service';
 import { Player } from '../../interfaces/player.interface';
 import { Draft } from '../../interfaces/draft.interface';
-import { UseFilters, HttpException } from '@nestjs/common';
-import { HttpExceptionFilter } from '../../filters/http-exception.filter';
-import { response } from 'express';
 
 describe('Draft Controller', () => {
   let controller: DraftController;
@@ -45,5 +42,16 @@ describe('Draft Controller', () => {
     expect(playerServiceSpy).toHaveBeenCalled();
     expect(draftServiceSpy).toHaveBeenCalled();
     expect(response.draftId).toBeTruthy();
+  });
+
+  it('should start draft', async () => {
+    const mockPlayer = { draftId: 'y' } as Player;
+    const playerServiceSpy = jest.spyOn(playerService, 'get').mockImplementation(() => mockPlayer);
+    
+    const draftServiceSpy = jest.spyOn(draftService, 'start').mockImplementation();
+    await controller.start({ user: { userId: 'x' } });
+    
+    expect(playerServiceSpy).toHaveBeenCalled();
+    expect(draftServiceSpy).toHaveBeenCalled();
   });
 });

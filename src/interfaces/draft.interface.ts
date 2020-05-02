@@ -8,6 +8,7 @@ export interface Draft {
   type: DraftType;
   id: string;
   started: boolean;
+  activePicks: DraftPick[];
 }
 
 export enum Direction {
@@ -18,4 +19,14 @@ export enum Direction {
 export enum DraftType {
   Winston,
   Grid,
+}
+
+export interface DraftPick {
+  piles: CardPile[];
+  currentPlayer: Player;
+  remainingPicks: number;
+}
+
+export interface CardPile {
+  cards: Card[];
 }

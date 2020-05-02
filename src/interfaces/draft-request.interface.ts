@@ -11,3 +11,13 @@ export interface DraftRequest {
     maxPlayers: number;
   }
 }
+
+export interface DraftPickRequest {
+  user: {
+    username: string;
+    userId: string;
+  };
+  body: {
+    pileIndex: number;
+  }
+}
