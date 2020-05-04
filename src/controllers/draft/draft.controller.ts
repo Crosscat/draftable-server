@@ -1,4 +1,4 @@
-import { Controller, Request, Post, UseGuards, UseFilters, Get } from '@nestjs/common';
+import { Controller, Request, Post, UseGuards, UseFilters, Get, Inject } from '@nestjs/common';
 
 import { DraftService } from '../../services/draft/draft.service';
 import { DraftRequest, DraftPickRequest } from '../../interfaces/draft-request.interface';
@@ -8,6 +8,7 @@ import { PlayerService } from '../../services/player/player.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { DraftPick } from '../../interfaces/draft.interface';
 import { Card } from '../../interfaces/card.interface';
+import { DraftPickService } from '../../interfaces/draftpick.service.interface';
 
 @Controller('draft')
 @UseFilters(new HttpExceptionFilter())
@@ -15,6 +16,7 @@ import { Card } from '../../interfaces/card.interface';
 export class DraftController {
   constructor(
     private readonly draft: DraftService,
+    @Inject('DraftPickService') private readonly draftPick: DraftPickService,
     private readonly player: PlayerService,
   ) { }
 
@@ -26,6 +28,8 @@ export class DraftController {
       draftId: draftData.id,
     }
 
+    console.log(`Player ${player.name} has joined draft ${draftData.id}!`);
+
     return response;
   }
 
@@ -34,19 +38,29 @@ export class DraftController {
     const player = this.player.get(req.user.userId);
 
     this.draft.start(player);
+    this.draftPick.initialize(this.draft.get(player.draftId));
+
+    console.log(`Player ${player.name} has started draft ${player.draftId}!`);
   }
 
   @Get()
   public async get(@Request() req: any): Promise<DraftPick> {
     const player = this.player.get(req.user.userId);
+    const pick = this.draft.getDraftPick(player);
 
-    return this.draft.getDraftPick(player);
+    console.log(`Player ${player.name} has requested draft pick ${pick}!`);
+
+    return pick;
   }
 
   @Post()
   public async choose(@Request() req: DraftPickRequest): Promise<Card[]> {
     const player = this.player.get(req.user.userId);
+    const newCards = this.draftPick.select(player, req.body.arrangementIndex);
+    this.player.addCards(player, newCards);
 
-    return this.draft.selectPile(player, req.body.pileIndex);
+    console.log(`Player ${player.name} has has chosen ${newCards}!`);
+
+    return player.selected;
   }
 }

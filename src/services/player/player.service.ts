@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
 import { Player, PlayerResponse } from '../../interfaces/player.interface';
 import { AuthService } from '../auth/auth.service';
+import { Card } from '../../interfaces/card.interface';
 
 @Injectable()
 export class PlayerService {
@@ -31,5 +32,9 @@ export class PlayerService {
     }
 
     return this.players[id];
+  }
+
+  public addCards(player: Player, cards: Card[]) {
+    player.selected = player.selected.concat(cards);
   }
 }

@@ -3,12 +3,11 @@ import { Card } from "./card.interface";
 
 export interface Draft {
   players: Player[];
-  cards: Card[];
+  outstandingCards: Card[];
   direction: Direction;
-  type: DraftType;
   id: string;
   started: boolean;
-  activePicks: DraftPick[];
+  info: DraftInfo;
 }
 
 export enum Direction {
@@ -16,17 +15,17 @@ export enum Direction {
   Right,
 }
 
-export enum DraftType {
-  Winston,
-  Grid,
+export interface DraftInfo {
+  simultaneousPicks: number;
+  totalCards: number;
+  cardsPerPlayer: number;
+  numberOfPlayers: number;
+  picksBeforeRefresh: number;
+  arrangementsPerPick: number;
 }
 
 export interface DraftPick {
-  piles: CardPile[];
-  currentPlayer: Player;
-  remainingPicks: number;
-}
-
-export interface CardPile {
   cards: Card[];
+  possibleArrangements: Record<number, Card[]>;
+  remainingPicks: number;
 }

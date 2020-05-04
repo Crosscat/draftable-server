@@ -1,5 +1,3 @@
-import { DraftType } from "./draft.interface";
-
 export interface DraftRequest {
   user: {
     username: string;
@@ -7,7 +5,7 @@ export interface DraftRequest {
   };
   body: {
     draftId?: string;
-    draftType: DraftType;
+    draftType: string;
     maxPlayers: number;
   }
 }
@@ -18,6 +16,6 @@ export interface DraftPickRequest {
     userId: string;
   };
   body: {
-    pileIndex: number;
+    arrangementIndex: number;
   }
 }

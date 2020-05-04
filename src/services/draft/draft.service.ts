@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
-import { Draft, DraftPick } from '../../interfaces/draft.interface';
+import { Draft, DraftPick, Direction } from '../../interfaces/draft.interface';
 import { Player } from '../../interfaces/player.interface';
 import { Card } from '../../interfaces/card.interface';
 
@@ -44,25 +44,30 @@ export class DraftService {
     draft.started = true;
   }
 
+  public draw(draft: Draft, number: number): Card[] {
+    const cards = draft.outstandingCards.slice(number);
+    draft.outstandingCards = draft.outstandingCards.slice(number, draft.outstandingCards.length);
+
+    return cards;
+  }
+
   public getDraftPick(playerData: Player): DraftPick {
     const draft = this.get(playerData.draftId);
     if (!draft.started) {
       throw Error('Draft has not started');
     }
 
-    const draftPick = draft.activePicks.find(x => x.currentPlayer.id === playerData.id);
-    if (!draftPick) {
+    if (!playerData.pickQueue || playerData.pickQueue.length === 0 || !playerData.pickQueue[0]) {
       throw Error('No available picks');
     }
 
-    return draftPick;
+    return playerData.pickQueue[0];
   }
 
-  public selectPile(playerData: Player, pileIndex: number): Card[] {
-    const draftPick = this.getDraftPick(playerData);
-    const picks = draftPick.piles[pileIndex];
-
-    return playerData.picks.concat(picks.cards);
+  public getNextPlayer(currentPlayer: Player): Player {
+    const draft = this.get(currentPlayer.draftId);
+    
+    return draft.direction === Direction.Left ? currentPlayer.previousPlayer : currentPlayer.nextPlayer;
   }
 
   private joinNew(playerData: Player, draftId: string): Draft {
