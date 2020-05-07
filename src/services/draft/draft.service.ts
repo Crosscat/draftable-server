@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid';
 import { Draft, DraftPick, Direction } from '../../interfaces/draft.interface';
 import { Player } from '../../interfaces/player.interface';
 import { Card } from '../../interfaces/card.interface';
+import { DraftRequest } from '../../interfaces/draft-request.interface';
 
 @Injectable()
 export class DraftService {
@@ -22,12 +23,6 @@ export class DraftService {
 
   public exists(draftId: string): boolean {
     return this.drafts.hasOwnProperty(draftId);
-  }
-
-  public join(playerData: Player, draftId?: string): Draft {
-    const id = draftId || uuid();
-
-    return this.exists(id) ? this.joinExisting(playerData, id) : this.joinNew(playerData, id);
   }
 
   public start(playerData: Player) {
@@ -70,23 +65,28 @@ export class DraftService {
     return draft.direction === Direction.Left ? currentPlayer.previousPlayer : currentPlayer.nextPlayer;
   }
 
-  private joinNew(playerData: Player, draftId: string): Draft {
+  public joinNew(playerData: Player, request: DraftRequest): Draft {
+    const draftId = request.body.draftId || uuid();
     const draft = {
       id: draftId,
       players: [playerData],
+      cube: request.body.cube,
+      outstandingCards: request.body.cube, // this needs moved out
     } as Draft;
     playerData.ownsDraft = true;
+    playerData.draftId = draftId;
 
     this.drafts[draftId] = draft;
     
     return draft;
   }
 
-  private joinExisting(playerData: Player, draftId: string): Draft {
+  public joinExisting(playerData: Player, draftId: string): Draft {
     const draft = this.get(draftId);
     if (draft.started) {
       throw Error(`Draft ${draftId} already started`);
     }
+    playerData.draftId = draftId;
 
     draft.players.push(playerData);
     return draft;

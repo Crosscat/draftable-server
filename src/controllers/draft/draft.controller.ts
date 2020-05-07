@@ -23,7 +23,10 @@ export class DraftController {
   @Post()
   public async join(@Request() req: DraftRequest): Promise<DraftResponse> {
     const player = this.player.get(req.user.userId);
-    const draftData = this.draft.join(player, req.body.draftId);
+    const draftData = req.body.draftId && this.draft.exists(req.body.draftId) ?
+      this.draft.joinExisting(player, req.body.draftId) :
+      this.draft.joinNew(player, req);
+
     const response = {
       draftId: draftData.id,
     }

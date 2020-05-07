@@ -3,6 +3,7 @@ import { Card } from "./card.interface";
 
 export interface Draft {
   players: Player[];
+  cube: Card[];
   outstandingCards: Card[];
   direction: Direction;
   id: string;

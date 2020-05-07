@@ -11,7 +11,7 @@ export class PlayerController {
   ) { }
 
   @Post()
-  public async createPlayer(@Body() request: PlayerRequest): Promise<PlayerResponse> {
+  public async create(@Body() request: PlayerRequest): Promise<PlayerResponse> {
     return this.player.new(request.name);
   }
 }

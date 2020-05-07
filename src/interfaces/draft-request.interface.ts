@@ -1,3 +1,5 @@
+import { Card } from "./card.interface";
+
 export interface DraftRequest {
   user: {
     username: string;
@@ -7,6 +9,7 @@ export interface DraftRequest {
     draftId?: string;
     draftType: string;
     maxPlayers: number;
+    cube?: Card[];
   }
 }
 

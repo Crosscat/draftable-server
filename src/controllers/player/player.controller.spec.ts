@@ -25,7 +25,7 @@ describe('Player Controller', () => {
     const mockResponse = Promise.resolve({} as PlayerResponse);
     const spy = jest.spyOn(playerService, 'new').mockImplementation(() => mockResponse);
 
-    controller.createPlayer({ name: 'bob' });
+    controller.create({ name: 'bob' });
 
     expect(spy).toHaveBeenCalledWith('bob');
   });
