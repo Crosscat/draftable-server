@@ -1,8 +1,7 @@
 import { Injectable, HttpService } from '@nestjs/common';
-import { map, pluck } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import { Card } from '../../interfaces/card.interface';
-import { response } from 'express';
 
 @Injectable()
 export class CubeService {
@@ -17,7 +16,7 @@ export class CubeService {
   private async createCard(card: string): Promise<Card> {
     return this.http.get(`https://api.scryfall.com/cards/named?exact=${card}`).pipe(
       map(response => response.data),
-      map((data: any) => ({ name: data.name, imageUrl: data.image_uris.normal })),
+      map((data: any) => ({ name: data.name, imageUrl: data.image_uris?.normal })),
     ).toPromise();
   }
 }

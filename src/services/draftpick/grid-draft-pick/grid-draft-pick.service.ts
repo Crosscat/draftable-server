@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+
 import { DraftPickService } from '../../../interfaces/draftpick.service.interface';
 import { Draft, DraftPick } from '../../../interfaces/draft.interface';
 import { DraftService } from '../../draft/draft.service';
@@ -10,24 +11,6 @@ export class GridDraftPickService implements DraftPickService {
   constructor(
     private readonly draftService: DraftService,
   ) { }
-
-  public create(draft: Draft): DraftPick {
-    const cards = this.draftService.draw(draft, 9);
-    const possibleArrangements = {
-      0: [cards[0], cards[1], cards[2]],
-      1: [cards[3], cards[4], cards[5]],
-      2: [cards[6], cards[7], cards[8]],
-      3: [cards[0], cards[3], cards[6]],
-      4: [cards[1], cards[4], cards[7]],
-      5: [cards[2], cards[5], cards[8]],
-    };
-
-    return {
-      cards,
-      possibleArrangements,
-      remainingPicks: 2,
-    }
-  }
 
   public select(player: Player, arrangementIndex: number): Card[] {
     if (player.pickQueue == null || player.pickQueue.length === 0 || player.pickQueue[0].remainingPicks <= 0) {
@@ -52,13 +35,35 @@ export class GridDraftPickService implements DraftPickService {
     return cards;
   }
 
-  public initialize(draft: Draft) {
+  public initialize(draftId: string) {
+    const draft = this.draftService.get(draftId);
+    draft.outstandingCards = draft.cube;
+    
     // hardcoded to 2 player for now
     const pick1 = this.create(draft);
     const pick2 = this.create(draft);
     
     draft.players[0].pickQueue = [pick1];
     draft.players[1].pickQueue = [pick2];
+  }
+
+  private create(draft: Draft): DraftPick {
+    const cards = this.draftService.draw(draft, 9);
+    console.log('CARDS', cards);
+    const possibleArrangements = [
+      [cards[0], cards[1], cards[2]],
+      [cards[3], cards[4], cards[5]],
+      [cards[6], cards[7], cards[8]],
+      [cards[0], cards[3], cards[6]],
+      [cards[1], cards[4], cards[7]],
+      [cards[2], cards[5], cards[8]],
+    ];
+
+    return {
+      cards,
+      possibleArrangements,
+      remainingPicks: 2,
+    }
   }
 
   private pass(player: Player) {

@@ -27,6 +27,6 @@ export interface DraftInfo {
 
 export interface DraftPick {
   cards: Card[];
-  possibleArrangements: Record<number, Card[]>;
+  possibleArrangements: Card[][];
   remainingPicks: number;
 }

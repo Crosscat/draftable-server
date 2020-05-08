@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
+
 import { Draft, DraftPick, Direction } from '../../interfaces/draft.interface';
 import { Player } from '../../interfaces/player.interface';
 import { Card } from '../../interfaces/card.interface';
@@ -40,7 +41,7 @@ export class DraftService {
   }
 
   public draw(draft: Draft, number: number): Card[] {
-    const cards = draft.outstandingCards.slice(number);
+    const cards = draft.outstandingCards.slice(0, number);
     draft.outstandingCards = draft.outstandingCards.slice(number, draft.outstandingCards.length);
 
     return cards;
@@ -71,7 +72,6 @@ export class DraftService {
       id: draftId,
       players: [playerData],
       cube: request.body.cube,
-      outstandingCards: request.body.cube, // this needs moved out
     } as Draft;
     playerData.ownsDraft = true;
     playerData.draftId = draftId;

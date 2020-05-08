@@ -41,7 +41,7 @@ export class DraftController {
     const player = this.player.get(req.user.userId);
 
     this.draft.start(player);
-    this.draftPick.initialize(this.draft.get(player.draftId));
+    this.draftPick.initialize(player.draftId);
 
     console.log(`Player ${player.name} has started draft ${player.draftId}!`);
   }
@@ -51,7 +51,7 @@ export class DraftController {
     const player = this.player.get(req.user.userId);
     const pick = this.draft.getDraftPick(player);
 
-    console.log(`Player ${player.name} has requested draft pick ${pick}!`);
+    console.log(`Player ${player.name} has requested draft pick ${JSON.stringify(pick)}!`);
 
     return pick;
   }
