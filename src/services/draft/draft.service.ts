@@ -37,6 +37,12 @@ export class DraftService {
       throw Error(`Player ${playerData.name} cannot start the draft`);
     }
 
+    // TODO: shuffle players
+
+    for (let i = 0; i < draft.players.length; i++) {
+      draft.players[i].previousPlayer = i < draft.players.length - 1 ? draft.players[i + 1] : draft.players[0];
+      draft.players[i].nextPlayer = i > 0 ? draft.players[i - 1] : draft.players[draft.players.length - 1];
+    }
     draft.started = true;
   }
 
@@ -54,6 +60,10 @@ export class DraftService {
     }
 
     if (!playerData.pickQueue || playerData.pickQueue.length === 0 || !playerData.pickQueue[0]) {
+      if (draft.outstandingCards.length === 0 && !draft.players.some(x => x.pickQueue.length > 0)) {
+        return { cards: [], possibleArrangements: [], remainingPicks: 0 };
+      }
+
       throw Error('No available picks');
     }
 
@@ -72,6 +82,7 @@ export class DraftService {
       id: draftId,
       players: [playerData],
       cube: request.body.cube,
+      direction: Direction.Left,
     } as Draft;
     playerData.ownsDraft = true;
     playerData.draftId = draftId;

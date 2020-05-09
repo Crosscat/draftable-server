@@ -10,13 +10,13 @@ export class CubeService {
   ) { }
 
   public async create(cards: string[]): Promise<Card[]> {
-    return Promise.all(cards.map((card) => this.createCard(card)));
+    return Promise.all(cards.map((card, i) => this.createCard(card, i)));
   }
 
-  private async createCard(card: string): Promise<Card> {
+  private async createCard(card: string, id: number): Promise<Card> {
     return this.http.get(`https://api.scryfall.com/cards/named?exact=${card}`).pipe(
       map(response => response.data),
-      map((data: any) => ({ name: data.name, imageUrl: data.image_uris?.normal })),
+      map((data: any) => ({ id, name: data.name, imageUrl: data.image_uris?.normal })),
     ).toPromise();
   }
 }

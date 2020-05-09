@@ -17,7 +17,7 @@ export class GridDraftPickService implements DraftPickService {
       throw Error('Invalid pick');
     }
     
-    const cards = player.pickQueue[0].possibleArrangements[arrangementIndex];
+    const cards = player.pickQueue[0].possibleArrangements[arrangementIndex].filter(x => x != null);
     player.pickQueue[0].remainingPicks--;
     
     // remove taken cards from current pick
@@ -49,7 +49,6 @@ export class GridDraftPickService implements DraftPickService {
 
   private create(draft: Draft): DraftPick {
     const cards = this.draftService.draw(draft, 9);
-    console.log('CARDS', cards);
     const possibleArrangements = [
       [cards[0], cards[1], cards[2]],
       [cards[3], cards[4], cards[5]],

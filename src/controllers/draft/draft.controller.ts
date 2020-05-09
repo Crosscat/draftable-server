@@ -51,19 +51,29 @@ export class DraftController {
     const player = this.player.get(req.user.userId);
     const pick = this.draft.getDraftPick(player);
 
-    console.log(`Player ${player.name} has requested draft pick ${JSON.stringify(pick)}!`);
+    console.log(`Player ${player.name} has requested draft pick ${JSON.stringify(this.simplifyPick(pick))}!`);
 
     return pick;
   }
 
-  @Post()
+  @Post('choose')
   public async choose(@Request() req: DraftPickRequest): Promise<Card[]> {
     const player = this.player.get(req.user.userId);
     const newCards = this.draftPick.select(player, req.body.arrangementIndex);
     this.player.addCards(player, newCards);
 
-    console.log(`Player ${player.name} has has chosen ${newCards}!`);
+    console.log(`Player ${player.name} has has chosen ${JSON.stringify(this.simplifyCards(newCards))}!`);
 
     return player.selected;
+  }
+
+  private simplifyPick(pick: DraftPick) {
+    return pick.possibleArrangements.map(arrangement => 
+      this.simplifyCards(arrangement),
+    );
+  }
+
+  private simplifyCards(cards: Card[]) {
+    return cards.map(x => x?.id);
   }
 }

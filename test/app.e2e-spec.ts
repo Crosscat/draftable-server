@@ -38,7 +38,9 @@ describe('App (e2e)', () => {
     response = await server.post('/cube').send(cardsMock);
     const cube: Card[] = response.body;
     expect(response.status).toBe(201);
-    expect(cube.length).toEqual(20);
+    expect(cube.length).toEqual(18);
+    expect(cube[0].id).toEqual(0);
+    expect(cube[1].id).toEqual(1);
 
     // player 1 creates draft
     response = await server.post('/draft').send({ draftId: 'x', cube }).set('Authorization', `Bearer ${accessToken1}`);
@@ -59,21 +61,60 @@ describe('App (e2e)', () => {
     // player 1 gets draft pick data
     response = await server.get(`/draft`).set('Authorization', `Bearer ${accessToken1}`);
     expect(response.status).toBe(200);
-    const draftPick1 = response.body as DraftPick;
+    let draftPick1 = response.body as DraftPick;
     expect(draftPick1.cards.length).toBe(9);
     expect(draftPick1.possibleArrangements.length).toBe(6);
     expect(response)
     
     // player 2 gets draft pick data
-    const response2 = await server.get(`/draft`).set('Authorization', `Bearer ${accessToken2}`);
+    let response2 = await server.get(`/draft`).set('Authorization', `Bearer ${accessToken2}`);
     expect(response2.status).toBe(200);
-    const draftPick2 = response2.body as DraftPick;
+    let draftPick2 = response2.body as DraftPick;
     expect(draftPick2.cards.length).toBe(9);
     expect(draftPick2.possibleArrangements.length).toBe(6);
 
     expect(draftPick1).not.toEqual(draftPick2);
 
     // player 1 makes pick
-    response = await server.get('/draft')
+    response = await server.post('/draft/choose').send({ arrangementIndex: 0 }).set('Authorization', `Bearer ${accessToken1}`);
+    expect(response.status).toBe(201);
+    expect((response.body as Card[]).length).toBe(3);
+    
+    // player 2 makes pick
+    response = await server.post('/draft/choose').send({ arrangementIndex: 0 }).set('Authorization', `Bearer ${accessToken2}`);
+    expect(response.status).toBe(201);
+    expect((response.body as Card[]).length).toBe(3);
+
+    // player 1 gets draft pick data again
+    response = await server.get(`/draft`).set('Authorization', `Bearer ${accessToken1}`);
+    expect(response.status).toBe(200);
+    draftPick1 = response.body as DraftPick;
+    expect(draftPick1.cards.length).toBe(6);
+    expect(draftPick1.possibleArrangements.length).toBe(6);
+    expect(response)
+    
+    // player 2 gets draft pick data again
+    response2 = await server.get(`/draft`).set('Authorization', `Bearer ${accessToken2}`);
+    expect(response2.status).toBe(200);
+    draftPick2 = response2.body as DraftPick;
+    expect(draftPick2.cards.length).toBe(6);
+    expect(draftPick2.possibleArrangements.length).toBe(6);
+
+    // player 1 makes pick again
+    response = await server.post('/draft/choose').send({ arrangementIndex: 3 }).set('Authorization', `Bearer ${accessToken1}`);
+    expect(response.status).toBe(201);
+    expect((response.body as Card[]).length).toBe(5);
+    
+    // player 2 makes pick
+    response = await server.post('/draft/choose').send({ arrangementIndex: 2 }).set('Authorization', `Bearer ${accessToken2}`);
+    expect(response.status).toBe(201);
+    expect((response.body as Card[]).length).toBe(6);
+
+    // player 1 tries to get draft data again but it's over
+    response = await server.get(`/draft`).set('Authorization', `Bearer ${accessToken1}`);
+    expect(response.status).toBe(200);
+    draftPick1 = response.body as DraftPick;
+    expect(draftPick1.cards.length).toBe(0);
+    expect(draftPick1.possibleArrangements.length).toBe(6);
   });
 });

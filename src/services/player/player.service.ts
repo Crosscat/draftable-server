@@ -20,6 +20,7 @@ export class PlayerService {
     const player = {
       name,
       id: playerId,
+      selected: [],
     } as Player;
     this.players[playerId] = player;
 
