@@ -2,7 +2,7 @@ import { DraftPick } from "../interfaces/draft.interface";
 import { Card } from "../interfaces/card.interface";
 
 export class Utils {
-  public static shuffleArray(array: any[]) {
+  public static shuffleArray(array: any[]): any[] {
     let currentIndex = array.length;
     let temp: any[];
     let randomIndex: number;
@@ -17,13 +17,13 @@ export class Utils {
     return array;
   }
 
-  public static  simplifyPick(pick: DraftPick) {
+  public static simplifyPick(pick: DraftPick): string[][] {
     return pick.possibleArrangements.map(arrangement => 
       this.simplifyCards(arrangement),
     );
   }
 
-  public static  simplifyCards(cards: Card[]) {
-    return cards.map(x => x?.id);
+  public static simplifyCards(cards: Card[]): string[] {
+    return cards.map(x => x?.name);
   }
 }

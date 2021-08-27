@@ -1,5 +1,7 @@
-import { Module, HttpModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { HttpModule } from '@nestjs/axios';
+
 import { AuthModule } from './auth/auth.module';
 import { DraftService } from '../services/draft/draft.service';
 import { PlayerService } from '../services/player/player.service';

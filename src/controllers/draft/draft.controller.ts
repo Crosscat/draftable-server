@@ -1,7 +1,7 @@
-import { Controller, Request, Post, UseGuards, Get, Inject, Body, UseInterceptors } from '@nestjs/common';
+import { Controller, Request, Post, UseGuards, Get, Inject, Body, UseInterceptors, Param } from '@nestjs/common';
 
 import { DraftService } from '../../services/draft/draft.service';
-import { DraftRequest, DraftPickRequest } from '../../interfaces/draft-request.interface';
+import { NewDraftRequest, DraftPickRequest } from '../../interfaces/draft-request.interface';
 import { DraftResponse } from '../../interfaces/draft-response.interface';
 import { PlayerService } from '../../services/player/player.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
@@ -22,14 +22,28 @@ export class DraftController {
   ) { }
 
   @Post()
+  public async create(
+    @Request() req: any,
+    @Body() draftRequest: NewDraftRequest,
+  ): Promise<DraftResponse> {
+    const draftData = this.draft.joinNew(req.player, draftRequest);
+
+    const response = {
+      draftId: draftData.id,
+    }
+
+    console.log(`Player ${req.player.name} has joined draft ${draftData.id}!`);
+
+    return response;
+  }
+
+  @Post(':draftId')
   public async join(
     @Request() req: any,
-    @Body() draftRequest: DraftRequest,
+    @Param() draftId: string,
   ): Promise<DraftResponse> {
-    const draftData = draftRequest.draftId && this.draft.exists(draftRequest.draftId) ?
-      this.draft.joinExisting(req.player, draftRequest.draftId) :
-      this.draft.joinNew(req.player, draftRequest);
-
+    const draftData = this.draft.joinExisting(req.player, draftId);
+    
     const response = {
       draftId: draftData.id,
     }

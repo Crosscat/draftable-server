@@ -1,12 +1,12 @@
 import { Card } from "./card.interface";
 
-export interface DraftRequest {
+export interface NewDraftRequest {
   cardsPerPlayer: number;
   draftId?: string;
   draftType: string;
   minPlayers: number;
   maxPlayers: number;
-  cube?: Card[];
+  cube: Card[];
 }
 
 export interface DraftPickRequest {

@@ -1,8 +1,7 @@
-import { JwtStrategy } from "./jwt.strategy";
 import { TestingModule, Test } from "@nestjs/testing";
+
+import { JwtStrategy } from "./jwt.strategy";
 import { AppModule } from "../modules/app.module";
-import { PlayerController } from "../controllers/player/player.controller";
-import { PlayerService } from "../services/player/player.service";
 
 describe('JwtStrategy', () => {
   let strategy: JwtStrategy;

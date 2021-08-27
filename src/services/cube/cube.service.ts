@@ -1,4 +1,5 @@
-import { Injectable, HttpService } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { Injectable } from '@nestjs/common';
 import { map } from 'rxjs/operators';
 
 import { Card } from '../../interfaces/card.interface';

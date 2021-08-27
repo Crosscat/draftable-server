@@ -4,7 +4,7 @@ import { v4 as uuid } from 'uuid';
 import { Draft, DraftPick, Direction } from '../../interfaces/draft.interface';
 import { Player } from '../../interfaces/player.interface';
 import { Card } from '../../interfaces/card.interface';
-import { DraftRequest } from '../../interfaces/draft-request.interface';
+import { NewDraftRequest } from '../../interfaces/draft-request.interface';
 import { Utils } from '../../utils/utils';
 
 @Injectable()
@@ -78,7 +78,7 @@ export class DraftService {
     return draft.direction === Direction.Left ? currentPlayer.previousPlayer : currentPlayer.nextPlayer;
   }
 
-  public joinNew(playerData: Player, request: DraftRequest): Draft {
+  public joinNew(playerData: Player, request: NewDraftRequest): Draft {
     const draftId = request.draftId || uuid();
     const draft = {
       id: draftId,
