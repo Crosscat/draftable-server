@@ -17,12 +17,10 @@ export enum Direction {
 }
 
 export interface DraftInfo {
-  simultaneousPicks: number;
-  totalCards: number;
   cardsPerPlayer: number;
-  numberOfPlayers: number;
+  minPlayers: number;
+  maxPlayers: number;
   picksBeforeRefresh: number;
-  arrangementsPerPick: number;
 }
 
 export interface DraftPick {

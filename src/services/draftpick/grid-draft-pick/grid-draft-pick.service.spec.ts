@@ -32,7 +32,7 @@ describe('GridDraftPickService', () => {
     
     expect(draft.players[0].pickQueue[0]).toBeTruthy();
     expect(draft.players[1].pickQueue[0]).toBeTruthy();
-    expect(draft.cube.length).toBe(19);
+    expect(draft.cube.length).toBe(18);
     expect(draft.outstandingCards.length).toBe(1);
     expect(draft.players[0].pickQueue[0]).toEqual({});
   });

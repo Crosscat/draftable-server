@@ -1,18 +1,19 @@
-import { Controller, Request, Post, UseGuards, UseFilters, Get, Inject } from '@nestjs/common';
+import { Controller, Request, Post, UseGuards, Get, Inject, Body, UseInterceptors } from '@nestjs/common';
 
 import { DraftService } from '../../services/draft/draft.service';
 import { DraftRequest, DraftPickRequest } from '../../interfaces/draft-request.interface';
 import { DraftResponse } from '../../interfaces/draft-response.interface';
-import { HttpExceptionFilter } from '../../filters/http-exception.filter';
 import { PlayerService } from '../../services/player/player.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { DraftPick } from '../../interfaces/draft.interface';
 import { Card } from '../../interfaces/card.interface';
 import { DraftPickService } from '../../interfaces/draftpick.service.interface';
+import { PlayerInterceptor } from '../../interceptors/player.interceptor';
+import { Utils } from '../../utils/utils';
 
 @Controller('draft')
-@UseFilters(new HttpExceptionFilter())
 @UseGuards(JwtAuthGuard)
+@UseInterceptors(PlayerInterceptor)
 export class DraftController {
   constructor(
     private readonly draft: DraftService,
@@ -21,59 +22,50 @@ export class DraftController {
   ) { }
 
   @Post()
-  public async join(@Request() req: DraftRequest): Promise<DraftResponse> {
-    const player = this.player.get(req.user.userId);
-    const draftData = req.body.draftId && this.draft.exists(req.body.draftId) ?
-      this.draft.joinExisting(player, req.body.draftId) :
-      this.draft.joinNew(player, req);
+  public async join(
+    @Request() req: any,
+    @Body() draftRequest: DraftRequest,
+  ): Promise<DraftResponse> {
+    const draftData = draftRequest.draftId && this.draft.exists(draftRequest.draftId) ?
+      this.draft.joinExisting(req.player, draftRequest.draftId) :
+      this.draft.joinNew(req.player, draftRequest);
 
     const response = {
       draftId: draftData.id,
     }
 
-    console.log(`Player ${player.name} has joined draft ${draftData.id}!`);
+    console.log(`Player ${req.player.name} has joined draft ${draftData.id}!`);
 
     return response;
   }
 
   @Post('start')
   public async start(@Request() req: any) {
-    const player = this.player.get(req.user.userId);
+    this.draft.start(req.player);
+    this.draftPick.initialize(req.player.draftId);
 
-    this.draft.start(player);
-    this.draftPick.initialize(player.draftId);
-
-    console.log(`Player ${player.name} has started draft ${player.draftId}!`);
+    console.log(`Player ${req.player.name} has started draft ${req.player.draftId}!`);
   }
 
   @Get()
   public async get(@Request() req: any): Promise<DraftPick> {
-    const player = this.player.get(req.user.userId);
-    const pick = this.draft.getDraftPick(player);
+    const pick = this.draft.getDraftPick(req.player);
 
-    console.log(`Player ${player.name} has requested draft pick ${JSON.stringify(this.simplifyPick(pick))}!`);
+    console.log(`Player ${req.player.name} has requested draft pick ${JSON.stringify(Utils.simplifyPick(pick))}!`);
 
     return pick;
   }
 
   @Post('choose')
-  public async choose(@Request() req: DraftPickRequest): Promise<Card[]> {
-    const player = this.player.get(req.user.userId);
-    const newCards = this.draftPick.select(player, req.body.arrangementIndex);
-    this.player.addCards(player, newCards);
+  public async choose(
+    @Request() req: any,
+    @Body() draftRequest: DraftPickRequest,
+  ): Promise<Card[]> {
+    const newCards = this.draftPick.select(req.player, draftRequest.arrangementIndex);
+    this.player.addCards(req.player, newCards);
 
-    console.log(`Player ${player.name} has has chosen ${JSON.stringify(this.simplifyCards(newCards))}!`);
+    console.log(`Player ${req.player.name} has has chosen ${JSON.stringify(Utils.simplifyCards(newCards))}!`);
 
-    return player.selected;
-  }
-
-  private simplifyPick(pick: DraftPick) {
-    return pick.possibleArrangements.map(arrangement => 
-      this.simplifyCards(arrangement),
-    );
-  }
-
-  private simplifyCards(cards: Card[]) {
-    return cards.map(x => x?.id);
+    return req.player.selected;
   }
 }

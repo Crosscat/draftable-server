@@ -5,6 +5,7 @@ import { Draft, DraftPick } from '../../../interfaces/draft.interface';
 import { DraftService } from '../../draft/draft.service';
 import { Player } from '../../../interfaces/player.interface';
 import { Card } from '../../../interfaces/card.interface';
+import { Utils } from '../../../utils/utils';
 
 @Injectable()
 export class GridDraftPickService implements DraftPickService {
@@ -37,7 +38,9 @@ export class GridDraftPickService implements DraftPickService {
 
   public initialize(draftId: string) {
     const draft = this.draftService.get(draftId);
-    draft.outstandingCards = draft.cube;
+    const poolSize = draft.info.cardsPerPlayer * draft.players.length;
+    console.log('pool size', poolSize);
+    draft.outstandingCards = Utils.shuffleArray(draft.cube).slice(0, poolSize);
     
     // hardcoded to 2 player for now
     const pick1 = this.create(draft);

@@ -5,6 +5,7 @@ import { Draft, DraftPick, Direction } from '../../interfaces/draft.interface';
 import { Player } from '../../interfaces/player.interface';
 import { Card } from '../../interfaces/card.interface';
 import { DraftRequest } from '../../interfaces/draft-request.interface';
+import { Utils } from '../../utils/utils';
 
 @Injectable()
 export class DraftService {
@@ -37,12 +38,13 @@ export class DraftService {
       throw Error(`Player ${playerData.name} cannot start the draft`);
     }
 
-    // TODO: shuffle players
+    draft.players = Utils.shuffleArray(draft.players);
 
     for (let i = 0; i < draft.players.length; i++) {
       draft.players[i].previousPlayer = i < draft.players.length - 1 ? draft.players[i + 1] : draft.players[0];
       draft.players[i].nextPlayer = i > 0 ? draft.players[i - 1] : draft.players[draft.players.length - 1];
     }
+
     draft.started = true;
   }
 
@@ -77,12 +79,17 @@ export class DraftService {
   }
 
   public joinNew(playerData: Player, request: DraftRequest): Draft {
-    const draftId = request.body.draftId || uuid();
+    const draftId = request.draftId || uuid();
     const draft = {
       id: draftId,
       players: [playerData],
-      cube: request.body.cube,
+      cube: request.cube,
       direction: Direction.Left,
+      info: {
+        cardsPerPlayer: request.cardsPerPlayer,
+        maxPlayers: request.maxPlayers,
+        minPlayers: request.minPlayers,
+      },
     } as Draft;
     playerData.ownsDraft = true;
     playerData.draftId = draftId;
