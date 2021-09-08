@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 
 import { Card } from '../../interfaces/card.interface';
 import { CubeService } from '../../services/cube/cube.service';

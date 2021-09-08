@@ -80,6 +80,10 @@ export class DraftService {
 
   public joinNew(playerData: Player, request: NewDraftRequest): Draft {
     const draftId = request.draftId || uuid();
+    if (this.exists(draftId)) {
+      throw Error(`Draft Id ${draftId} already exists`);
+    }
+
     const draft = {
       id: draftId,
       players: [playerData],

@@ -10,10 +10,28 @@ import { DraftController } from '../controllers/draft/draft.controller';
 import { GridDraftPickService } from '../services/draftpick/grid-draft-pick/grid-draft-pick.service';
 import { CubeController } from '../controllers/cube/cube.controller';
 import { CubeService } from '../services/cube/cube.service';
+import { DraftGateway } from '../gateways/draft.gateway';
 
 @Module({
-  controllers: [PlayerController, DraftController, CubeController],
-  imports: [ConfigModule.forRoot(), AuthModule, HttpModule],
-  providers: [DraftService, PlayerService, CubeService, { provide: 'DraftPickService', useClass: GridDraftPickService }],
+  controllers: [
+    PlayerController,
+    DraftController,
+    CubeController,
+  ],
+  imports: [
+    ConfigModule.forRoot(),
+    AuthModule,
+    HttpModule,
+  ],
+  providers: [
+    DraftService,
+    PlayerService,
+    CubeService,
+    {
+      provide: 'DraftPickService',
+      useClass: GridDraftPickService,
+    },
+    DraftGateway,
+  ],
 })
 export class AppModule {}

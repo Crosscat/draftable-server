@@ -10,6 +10,7 @@ import { Card } from '../../interfaces/card.interface';
 import { DraftPickService } from '../../interfaces/draftpick.service.interface';
 import { PlayerInterceptor } from '../../interceptors/player.interceptor';
 import { Utils } from '../../utils/utils';
+import { Player } from '../../interfaces/player.interface';
 
 @Controller('draft')
 @UseGuards(JwtAuthGuard)
@@ -40,7 +41,7 @@ export class DraftController {
   @Post(':draftId')
   public async join(
     @Request() req: any,
-    @Param() draftId: string,
+    @Param('draftId') draftId: string,
   ): Promise<DraftResponse> {
     const draftData = this.draft.joinExisting(req.player, draftId);
     
@@ -81,5 +82,10 @@ export class DraftController {
     console.log(`Player ${req.player.name} has has chosen ${JSON.stringify(Utils.simplifyCards(newCards))}!`);
 
     return req.player.selected;
+  }
+
+  @Get('players')
+  public async players(@Request() req: any): Promise<Player[]> {
+    return this.draft.get(req.player.draftId).players;
   }
 }
